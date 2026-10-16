@@ -2,18 +2,16 @@
 
 <div align="center">
 
-[![GitHub Release](https://img.shields.io/github/v/release/arefabacworkshop/RDNA2LLamacpp?logo=github&logoColor=white&style=for-the-badge)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest)
-[![Release Date](https://img.shields.io/github/release-date/arefabacworkshop/RDNA2LLamacpp?logo=github&logoColor=white&style=for-the-badge)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest)
+[![Build Pipeline](https://img.shields.io/github/actions/workflow/status/arefabacworkshop/RDNA2LLamacpp/build-llamacpp-rocm.yml?branch=main&logo=github&logoColor=white&style=for-the-badge)](https://github.com/arefabacworkshop/RDNA2LLamacpp/actions)
 [![License](https://img.shields.io/github/license/arefabacworkshop/RDNA2LLamacpp?style=for-the-badge)](LICENSE)
-
 [![ROCm 7.0](https://img.shields.io/badge/ROCm-7.0%20(TheRock)-red?logo=amd&logoColor=white&style=for-the-badge)](https://github.com/ROCm/ROCm)
 [![llama.cpp](https://img.shields.io/badge/Powered%20By-llama.cpp-blue?logo=llama&logoColor=white&style=for-the-badge)](https://github.com/ggerganov/llama.cpp)
 [![GPU Target](https://img.shields.io/badge/GPU-AMD%20RDNA2%20(gfx103X)-00B04F?logo=amd&logoColor=white&style=for-the-badge)](#-supported-gpus)
-[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Ubuntu-0078D6?logo=windows&logoColor=white&style=for-the-badge)](#-nightly-downloads)
+[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Ubuntu-0078D6?logo=windows&logoColor=white&style=for-the-badge)](#-building--running)
 
-**Automated, nightly, high-performance builds of [llama.cpp](https://github.com/ggerganov/llama.cpp) accelerated with AMD ROCm™ 7 (TheRock), specifically engineered for AMD Radeon RX 6000 series (RDNA2) GPUs.**
+**Automated CI/CD and build framework for [llama.cpp](https://github.com/ggerganov/llama.cpp) accelerated with AMD ROCm™ 7 (TheRock), specifically engineered for discrete AMD Radeon RX 6000 series (RDNA2 / gfx103X) GPUs.**
 
-[Quick Start](#-quick-start) • [Downloads](#-nightly-downloads) • [Supported GPUs](#-supported-gpus) • [RDNA2 Optimization](#-rdna2-performance-tuning) • [Manual Build](#-manual-compilation)
+[Supported GPUs](#-supported-gpus) • [Building & Running](#-building--running) • [RDNA2 Performance](#-rdna2-performance-tuning) • [Manual Build](#-manual-compilation)
 
 </div>
 
@@ -24,9 +22,9 @@
 Running local LLMs on consumer AMD GPUs under Windows and Linux has historically been difficult: official ROCm SDKs are massive (20+ GB), setup is error-prone, and standard releases often lack discrete RDNA2 device kernels.
 
 **RDNA2LLamacpp solves this:**
-- **Zero SDK Installation**: Binaries are 100% self-contained. All necessary ROCm runtime libraries (`amdhip64`, `rocblas`, `hipblaslt`, and pre-compiled `.kpack` GPU kernels) are bundled alongside the executable. Just extract and run.
+- **Zero SDK Installation**: Binaries can be packaged 100% self-contained. All necessary ROCm runtime libraries (`amdhip64`, `rocblas`, `hipblaslt`, and pre-compiled `.kpack` GPU kernels) are bundled alongside the executable.
 - **Dedicated RDNA2 Machine Code**: Compiled specifically for discrete RDNA2 sub-architectures (`gfx1030`, `gfx1031`, `gfx1032`, `gfx1034`), avoiding multi-architecture bloat.
-- **Nightly Freshness**: Our automated GitHub Actions pipeline automatically detects and integrates the latest daily `llama.cpp` upstream master with the freshest AMD TheRock nightly runtime.
+- **Automated Workflow**: An automated GitHub Actions pipeline that pairs upstream `llama.cpp` with AMD's freshest TheRock multi-arch nightly runtime.
 
 ---
 
@@ -41,36 +39,34 @@ This repository targets all discrete **AMD Radeon RX 6000 Series (RDNA2 / `gfx10
 | **`gfx1032`** | AMD Radeon **RX 6650 XT**, **RX 6600 XT**, **RX 6600** | 8 GB GDDR6 |
 | **`gfx1034`** | AMD Radeon **RX 6500 XT**, **RX 6400** | 4 GB GDDR6 |
 
-> [!NOTE]
-> All releases package a unified fat binary covering `gfx1030;gfx1031;gfx1032;gfx1034`, ensuring out-of-the-box compatibility across all cards above.
+---
+
+## 🚀 Building & Running
+
+### Option 1: Automated CI via GitHub Actions
+You can build the binaries directly in GitHub Actions without installing build tools locally:
+1. Go to the [**Actions** tab](https://github.com/arefabacworkshop/RDNA2LLamacpp/actions/workflows/build-llamacpp-rocm.yml) in the repository.
+2. Select **Build Llama.cpp + ROCm** and click **Run workflow**.
+3. Once completed, download the self-contained build artifacts from the workflow run summary (`llama-windows-rocm-gfx103X-x64` or `llama-ubuntu-rocm-gfx103X-x64`).
+
+### Option 2: Local Compilation
+To compile locally on your own machine using Visual Studio 2022 (Windows) or Clang (Ubuntu), follow our step-by-step instructions:  
+👉 **[docs/manual_instructions.md](docs/manual_instructions.md)**
 
 ---
 
-## 🚀 Nightly Downloads
+## 🧪 Running Inference
 
-| Operating System | Package | Direct Download |
-| :--- | :--- | :--- |
-| **Windows 10 / 11 (x64)** | `llama-b*-windows-rocm-gfx103X-x64.zip` | [![Download Windows](https://img.shields.io/badge/Download-Windows%20Build-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) |
-| **Ubuntu 22.04+ (x64)** | `llama-b*-ubuntu-rocm-gfx103X-x64.zip` | [![Download Ubuntu](https://img.shields.io/badge/Download-Ubuntu%20Build-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) |
+Once you have compiled or downloaded the binaries, run `llama-server` (OpenAI-compatible server) or `llama-cli`:
 
----
-
-## 🧪 Quick Start
-
-### 1. Download & Extract
-Download the archive for your operating system from [Latest Releases](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) and extract it to your preferred folder.
-
-### 2. Run Inference
-You can immediately launch `llama-server` (OpenAI-compatible local server) or `llama-cli` with any GGUF model:
-
-#### Windows (PowerShell / Command Prompt):
+### Windows:
 ```cmd
-llama-server.exe -m "C:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -ngl 99 -fa -b 512 -ub 256
+llama-server.exe -m "C:\models\your_model_Q4_K_M.gguf" -ngl 99 -fa -b 512 -ub 256
 ```
 
-#### Ubuntu:
+### Ubuntu:
 ```bash
-./llama-server -m ~/models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf -ngl 99 -fa -b 512 -ub 256
+./llama-server -m ~/models/your_model_Q4_K_M.gguf -ngl 99 -fa -b 512 -ub 256
 ```
 
 ---
@@ -103,14 +99,14 @@ RDNA2LLamacpp/
 ├── utils/
 │   └── gather_required_libs.py      # Dynamic Linux shared library dependency resolver
 ├── LICENSE                          # MIT License
-└── README.md                        # Documentation & quick start
+└── README.md                        # Documentation & build guide
 ```
 
 ---
 
-## 📋 Manual Compilation
+## 📋 Manual Compilation Guide
 
-If you prefer building from source on your own machine rather than downloading pre-compiled releases, refer to our detailed step-by-step guide:  
+For the complete local setup guide, commands, and dependency lists:  
 👉 **[docs/manual_instructions.md](docs/manual_instructions.md)**
 
 ---
