@@ -1,0 +1,15 @@
+# Build and temporary files
+build/
+llama.cpp/
+rocm/
+*.zip
+*.tar.gz
+*.log
+*.tmp
+
+# IDE and local configuration
+.vscode/
+.idea/
+
+# Agent task tracking
+tasks/
