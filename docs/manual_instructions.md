@@ -1,67 +1,77 @@
-# Manual Build Instructions
+# Manual Build Instructions (AMD RDNA2 / gfx103X)
 
-> These steps are a simplified local-build path. For the exact flags, packaging, and GPU matrix used in releases, see the [GitHub Actions workflow](../.github/workflows/build-llamacpp-rocm.yml).
+> These steps guide you through building **llama.cpp** with **AMD ROCm™ 7 (TheRock)** acceleration specifically for **AMD RDNA2 GPUs** (`gfx1030`, `gfx1031`, `gfx1032`, `gfx1034`).
 >
-> Prefer a [prebuilt release](https://github.com/lemonade-sdk/llamacpp-rocm/releases/latest) unless you need to compile locally.
+> For the automated GitHub Actions CI/CD matrix and release packaging, see the [GitHub Actions workflow](../.github/workflows/build-llamacpp-rocm.yml).
 
-- [Windows](#windows)
-- [Ubuntu](#ubuntu)
-- [GPU targets](#gpu-targets)
+- [Supported RDNA2 GPUs](#supported-rdna2-gpus)
+- [Download ROCm Nightly Tarball](#download-a-rocm-nightly-tarball)
+- [Windows Build](#windows)
+- [Ubuntu Build](#ubuntu)
+- [Portable Packaging (Standalone Binaries)](#portable-packaging-optional)
+- [Recommended Runtime Settings](#recommended-runtime-settings)
 
-## Download a ROCm nightly tarball
+---
 
-TheRock publishes nightlies at [rocm.nightlies.amd.com/tarball-multi-arch](https://rocm.nightlies.amd.com/tarball-multi-arch/). Open that index, pick the newest tarball for your OS and GPU family, and download it.
+## Supported RDNA2 GPUs
 
-| GPU family | Filename slot |
-| --- | --- |
-| gfx1151 | `gfx1151` |
-| gfx1150 | `gfx1150` |
-| gfx120X | `gfx120X-all` |
-| gfx110X | `gfx110X-all` |
-| gfx103X | `gfx103X-all` |
-| gfx90a | `gfx90a` |
-| gfx908 | `gfx908` |
+| Sub-Architecture | Discrete AMD Radeon GPUs |
+| :--- | :--- |
+| **`gfx1030`** | Radeon RX 6950 XT, RX 6900 XT, RX 6800 XT, RX 6800 |
+| **`gfx1031`** | Radeon RX 6750 XT, RX 6700 XT, RX 6700 |
+| **`gfx1032`** | Radeon RX 6650 XT, RX 6600 XT, RX 6600 |
+| **`gfx1034`** | Radeon RX 6500 XT, RX 6400 |
 
-Examples (replace the version with the newest file on the index):
+You can target all cards at once using `"gfx1030;gfx1031;gfx1032;gfx1034"`, or specify only your card's target (e.g., `"gfx1030"`) to produce a smaller, tailored binary.
 
-```
-https://rocm.nightlies.amd.com/tarball-multi-arch/therock-dist-windows-gfx1151-<version>.tar.gz
-https://rocm.nightlies.amd.com/tarball-multi-arch/therock-dist-linux-gfx1151-<version>.tar.gz
-```
+---
 
-Skip files with `-tests-` in the name.
+## Download a ROCm Nightly Tarball
+
+AMD TheRock publishes multi-arch nightlies at [nightly.repo.amd.com/rocm/core/tarball/](https://nightly.repo.amd.com/rocm/core/tarball/).
+
+Download the newest tarball for your operating system:
+- **Windows:** `therock-dist-windows-gfx103X-all-<version>.tar.gz`
+- **Linux:** `therock-dist-linux-gfx103X-all-<version>.tar.gz`
+
+*(Skip any files containing `-tests-` in the filename).*
+
+---
 
 ## Windows
 
-### 1. Install build tools
+### 1. Install Build Tools
 
-Chocolatey is optional; you can install the same tools by hand.
+Install Visual Studio 2022 (Desktop Development with C++, CMake, ATL, Windows 11 SDK) and Ninja:
 
+```powershell
+winget install Kitware.CMake Ninja-build.Ninja Git.Git
 ```
-choco install visualstudio2022buildtools -y --params "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.ATL --add Microsoft.VisualStudio.Component.Windows11SDK.22621"
-choco install cmake ninja python strawberryperl -y
-```
+*(Alternatively, install via Chocolatey: `choco install cmake ninja git -y`)*
+
+> [!IMPORTANT]
+> Use Visual Studio 2022 (MSVC 14.4x). Do not use preview MSVC 14.5x toolsets, as their `<cmath>` header introduces a `constexpr` symbol conflict with ROCm Clang.
 
 ### 2. Extract ROCm
 
-Download the Windows tarball for your GPU (see [above](#download-a-rocm-nightly-tarball)), then:
+Extract the downloaded Windows tarball to `C:\opt\rocm`:
 
-```
+```powershell
 mkdir C:\opt\rocm
-tar -xzf therock-dist-windows-<family>-<version>.tar.gz -C C:\opt\rocm --strip-components=1
+tar -xzf therock-dist-windows-gfx103X-all-<version>.tar.gz -C C:\opt\rocm --strip-components=1
 ```
 
-Clone llama.cpp:
+Clone `llama.cpp`:
 
-```
+```powershell
 git clone --filter=blob:none --single-branch --branch master https://github.com/ggerganov/llama.cpp.git
 ```
 
 ### 3. Build
 
-Open **x64 Native Tools Command Prompt** and run:
+Open **x64 Native Tools Command Prompt for VS 2022** and run:
 
-```
+```cmd
 set HIP_PATH=C:\opt\rocm
 set HIP_PLATFORM=amd
 set PATH=%HIP_PATH%\lib\llvm\bin;%HIP_PATH%\bin;%PATH%
@@ -73,10 +83,10 @@ cd build
 cmake .. -G Ninja ^
   -DCMAKE_C_COMPILER="C:\opt\rocm\lib\llvm\bin\clang.exe" ^
   -DCMAKE_CXX_COMPILER="C:\opt\rocm\lib\llvm\bin\clang++.exe" ^
-  -DCMAKE_CXX_FLAGS="-IC:\opt\rocm\include" ^
+  -DCMAKE_CXX_FLAGS="-IC:\opt\rocm\include -mwavefrontsize64=0" ^
   -DCMAKE_CROSSCOMPILING=ON ^
   -DCMAKE_BUILD_TYPE=Release ^
-  -DGPU_TARGETS="gfx1151" ^
+  -DGPU_TARGETS="gfx1030;gfx1031;gfx1032;gfx1034" ^
   -DBUILD_SHARED_LIBS=ON ^
   -DLLAMA_BUILD_TESTS=OFF ^
   -DGGML_HIP=ON ^
@@ -92,33 +102,33 @@ cmake .. -G Ninja ^
 cmake --build . -j %NUMBER_OF_PROCESSORS%
 ```
 
-Adjust `-DGPU_TARGETS` for your GPU (see [GPU targets](#gpu-targets)). Binaries land in `llama.cpp\build\bin`. Keep `C:\opt\rocm\bin` on `PATH` when you run them.
+Executables will be built into `llama.cpp\build\bin`.
+
+---
 
 ## Ubuntu
 
-### 1. Install build tools
+### 1. Install Build Tools
 
 ```bash
 sudo apt update
-sudo apt install -y cmake ninja-build git wget
+sudo apt install -y cmake ninja-build git wget curl
 ```
 
 ### 2. Extract ROCm
 
-Download the Linux tarball for your GPU (see [above](#download-a-rocm-nightly-tarball)), then:
-
 ```bash
 sudo mkdir -p /opt/rocm
-sudo tar -xzf therock-dist-linux-<family>-<version>.tar.gz -C /opt/rocm --strip-components=1
-```
+sudo tar -xzf therock-dist-linux-gfx103X-all-<version>.tar.gz -C /opt/rocm --strip-components=1
 
-```bash
 export HIP_PATH=/opt/rocm
 export ROCM_PATH=/opt/rocm
 export HIP_PLATFORM=amd
 export PATH=/opt/rocm/bin:/opt/rocm/llvm/bin:$PATH
 export LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/llvm/lib:${LD_LIBRARY_PATH:-}
 ```
+
+Clone `llama.cpp`:
 
 ```bash
 git clone --filter=blob:none --single-branch --branch master https://github.com/ggerganov/llama.cpp.git
@@ -134,10 +144,10 @@ cd build
 cmake .. -G Ninja \
   -DCMAKE_C_COMPILER=/opt/rocm/llvm/bin/clang \
   -DCMAKE_CXX_COMPILER=/opt/rocm/llvm/bin/clang++ \
-  -DCMAKE_CXX_FLAGS="-I/opt/rocm/include" \
+  -DCMAKE_CXX_FLAGS="-I/opt/rocm/include -mwavefrontsize64=0" \
   -DCMAKE_CROSSCOMPILING=ON \
   -DCMAKE_BUILD_TYPE=Release \
-  -DGPU_TARGETS="gfx1151" \
+  -DGPU_TARGETS="gfx1030;gfx1031;gfx1032;gfx1034" \
   -DBUILD_SHARED_LIBS=ON \
   -DLLAMA_BUILD_TESTS=OFF \
   -DGGML_HIP=ON \
@@ -153,20 +163,45 @@ cmake .. -G Ninja \
 cmake --build . -j $(nproc)
 ```
 
-Adjust `-DGPU_TARGETS` for your GPU (see [GPU targets](#gpu-targets)). Binaries land in `llama.cpp/build/bin`. Keep the ROCm `LD_LIBRARY_PATH` set when you run them.
+Binaries will be placed in `llama.cpp/build/bin`.
 
-To produce a portable folder with ROCm libraries copied next to the binaries (as in releases), copy the corresponding steps from the [workflow](../.github/workflows/build-llamacpp-rocm.yml) rather than duplicating that list here.
+---
 
-## GPU targets
+## Portable Packaging (Optional)
 
-Use the mapped architectures in `-DGPU_TARGETS`, not the tarball family name:
+To create a standalone folder with all required ROCm runtime libraries copied directly next to the binaries (no need for ROCm in system PATH):
 
-| Family | `-DGPU_TARGETS` | Examples |
-| --- | --- | --- |
-| gfx120X | `gfx1200;gfx1201` | RX 9070 XT/GRE/9070, RX 9060 XT/9060 |
-| gfx110X | `gfx1100;gfx1101;gfx1102;gfx1103` | RX 7900/7800/7700/7600, Radeon 780M/760M/740M |
-| gfx103X | `gfx1030;gfx1031;gfx1032;gfx1034` | RX 6800/6700/6600/6500 |
-| gfx1150 | `gfx1150` | Strix Point |
-| gfx1151 | `gfx1151` | Strix Halo |
-| gfx90a | `gfx90a` | Instinct MI210 |
-| gfx908 | `gfx908` | Instinct MI100 |
+### Windows (PowerShell):
+```powershell
+$rocmBin = "C:\opt\rocm\bin"
+$outDir = "llama.cpp\build\bin"
+
+# Copy core DLLs
+Copy-Item "$rocmBin\amdhip64_*.dll" $outDir
+Copy-Item "$rocmBin\rocm_kpack.dll" $outDir -ErrorAction SilentlyContinue
+Copy-Item "$rocmBin\amd_comgr*.dll" $outDir
+Copy-Item "$rocmBin\rocblas.dll" $outDir
+Copy-Item "$rocmBin\hipblas.dll" $outDir
+Copy-Item "$rocmBin\hipblaslt.dll" $outDir
+Copy-Item "$rocmBin\rocsolver.dll" $outDir
+Copy-Item "$rocmBin\origami.dll" $outDir -ErrorAction SilentlyContinue
+Copy-Item "$rocmBin\libtensilelite-host.dll" $outDir -ErrorAction SilentlyContinue
+
+# Copy kernel libraries
+Copy-Item -Recurse "$rocmBin\rocblas\library" "$outDir\rocblas\library"
+Copy-Item -Recurse "$rocmBin\hipblaslt\library" "$outDir\hipblaslt\library" -ErrorAction SilentlyContinue
+Copy-Item -Recurse "C:\opt\rocm\.kpack" "$outDir\.kpack" -ErrorAction SilentlyContinue
+```
+
+---
+
+## Recommended Runtime Settings
+
+To maximize performance on RDNA2 hardware:
+- **Enable Flash Attention**: Add `-fa` to drastically reduce VRAM usage and accelerate long-context prompt processing.
+- **Tune Batching**: Add `-b 512 -ub 256` to saturate memory throughput.
+- **Optimal Quantization**: Use **`Q4_K_M`** or **`Q5_K_M`** to fit critical weights into AMD's high-speed **Infinity Cache**.
+
+```bash
+llama-server -m your_model_Q4_K_M.gguf -ngl 99 -fa -b 512 -ub 256
+```

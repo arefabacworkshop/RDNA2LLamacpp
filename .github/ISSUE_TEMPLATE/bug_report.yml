@@ -35,7 +35,7 @@ body:
     attributes:
       label: GPU Model
       description: Which AMD GPU are you using?
-      placeholder: e.g. RX 7900 XTX, RX 6800 XT, MI300X
+      placeholder: e.g. RX 6900 XT, RX 6800 XT, RX 6700 XT, RX 6600
     validations:
       required: true
 
@@ -43,7 +43,7 @@ body:
     id: build-version
     attributes:
       label: llamacpp-rocm Build Version
-      description: Which release tag or build did you use? Check the [releases page](https://github.com/lemonade-sdk/llamacpp-rocm/releases).
+      description: Which release tag or build did you use? Check the [releases page](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases).
       placeholder: e.g. b1223
     validations:
       required: true

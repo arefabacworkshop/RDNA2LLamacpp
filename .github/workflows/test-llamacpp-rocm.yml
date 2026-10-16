@@ -7,9 +7,9 @@ on:
         required: false
         default: 'windows,ubuntu'
       gfx_target:
-        description: 'AMD GPU targets (comma-separated)'
+        description: 'AMD RDNA2 GPU targets (comma-separated: gfx103X, gfx1030, etc.)'
         required: false
-        default: 'gfx1151'
+        default: 'gfx103X'
       release_tag:
         description: 'Release tag to test (e.g., b1001) or "latest" for the most recent release'
         required: false
@@ -17,7 +17,7 @@ on:
 
 env:
   OPERATING_SYSTEMS: ${{ github.event.inputs.operating_systems || 'windows,ubuntu' }}
-  GFX_TARGETS: ${{ github.event.inputs.gfx_target || 'gfx1151' }}
+  GFX_TARGETS: ${{ github.event.inputs.gfx_target || 'gfx103X' }}
   RELEASE_TAG: ${{ github.event.inputs.release_tag || 'latest' }}
 
 jobs:
@@ -102,7 +102,7 @@ jobs:
         echo "Ubuntu test: $should_test_ubuntu"
         echo "Generated matrix: $matrix_targets"
   test-windows:
-    runs-on: [stx-halo, Windows]
+    runs-on: [self-hosted, Windows]
     needs: prepare-matrix
     if: needs.prepare-matrix.outputs.should_test_windows == 'true'
     strategy:
@@ -240,7 +240,7 @@ jobs:
           exit 1
         }
   test-ubuntu:
-    runs-on: [stx-halo, Linux]
+    runs-on: [self-hosted, Linux]
     needs: prepare-matrix
     if: needs.prepare-matrix.outputs.should_test_ubuntu == 'true'
     strategy:

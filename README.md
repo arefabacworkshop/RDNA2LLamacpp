@@ -1,125 +1,129 @@
-# llamacpp-rocm
+# 🦙 RDNA2LLamacpp
 
-<a href="https://github.com/aigdat/llamacpp-rocm/releases/latest" title="Download the latest release">
-  <img src="https://img.shields.io/github/v/release/aigdat/llamacpp-rocm?logo=github&logoColor=white" alt="GitHub release (latest by date)" />
-</a>
-<a href="https://github.com/aigdat/llamacpp-rocm/releases/latest" title="View latest release date">
-  <img src="https://img.shields.io/github/release-date/aigdat/llamacpp-rocm?logo=github&logoColor=white" alt="Latest release date" />
-</a>
-<a href="LICENSE" title="View license">
-  <img src="https://img.shields.io/github/license/aigdat/llamacpp-rocm?logo=opensourceinitiative&logoColor=white&cacheBust=1)" alt="License" />
-</a>
-<a href="https://github.com/ROCm/ROCm" title="Powered by ROCm 7.0">
-  <img src="https://img.shields.io/badge/ROCm-7.0-blue?logo=amd&logoColor=white" alt="ROCm 7.0" />
-</a>
-<a href="https://github.com/ggerganov/llama.cpp" title="Powered by llama.cpp">
-  <img src="https://img.shields.io/badge/🦙Powered%20by-llama.cpp-blue?logo=llama&logoColor=white" alt="Powered by llama.cpp" />
-</a>
-<a href="#-supported-devices" title="Platform support">
-  <img src="https://img.shields.io/badge/OS-Windows%20%7C%20Ubuntu-0078D6?logo=windows&logoColor=white" alt="Platform: Windows | Ubuntu" />
-</a>
-<a href="#-supported-devices" title="GPU targets">
-  <img src="https://img.shields.io/badge/GPU-gfx110X%20%7C%20gfx1150%20%7C%20gfx1151%20%7C%20gfx120X%20%7C%20gfx103X%20%7C%20gfx90a%20%7C%20gfx908-00B04F?logo=amd&logoColor=white" alt="GPU Targets" />
-</a>
+<div align="center">
 
+[![GitHub Release](https://img.shields.io/github/v/release/arefabacworkshop/RDNA2LLamacpp?logo=github&logoColor=white&style=for-the-badge)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest)
+[![Release Date](https://img.shields.io/github/release-date/arefabacworkshop/RDNA2LLamacpp?logo=github&logoColor=white&style=for-the-badge)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest)
+[![License](https://img.shields.io/github/license/arefabacworkshop/RDNA2LLamacpp?style=for-the-badge)](LICENSE)
 
-We provide nightly builds of **llama.cpp** with **AMD ROCm™ 7** acceleration based on TheRock - delivering the freshest, cutting-edge builds available. Our automated pipeline specifically targets seamless integration with [**🍋 Lemonade**](https://github.com/lemonade-sdk/lemonade) and similar AI applications requiring high-performance GPU inference.
+[![ROCm 7.0](https://img.shields.io/badge/ROCm-7.0%20(TheRock)-red?logo=amd&logoColor=white&style=for-the-badge)](https://github.com/ROCm/ROCm)
+[![llama.cpp](https://img.shields.io/badge/Powered%20By-llama.cpp-blue?logo=llama&logoColor=white&style=for-the-badge)](https://github.com/ggerganov/llama.cpp)
+[![GPU Target](https://img.shields.io/badge/GPU-AMD%20RDNA2%20(gfx103X)-00B04F?logo=amd&logoColor=white&style=for-the-badge)](#-supported-gpus)
+[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Ubuntu-0078D6?logo=windows&logoColor=white&style=for-the-badge)](#-nightly-downloads)
 
-> [!IMPORTANT]  
-> **Contribution & Support Notice**: While this project currently focuses on integrating llama.cpp+ROCm in a specific production context, our broader goal is to contribute meaningfully to the llama.cpp+ROCm ecosystem. We're not set up to provide comprehensive technical support, but we welcome collaborations, idea exchanges, or contributions that help advance this space.
+**Automated, nightly, high-performance builds of [llama.cpp](https://github.com/ggerganov/llama.cpp) accelerated with AMD ROCm™ 7 (TheRock), specifically engineered for AMD Radeon RX 6000 series (RDNA2) GPUs.**
 
-## 🎯 Supported Devices
+[Quick Start](#-quick-start) • [Downloads](#-nightly-downloads) • [Supported GPUs](#-supported-gpus) • [RDNA2 Optimization](#-rdna2-performance-tuning) • [Manual Build](#-manual-compilation)
 
-This build specifically targets the following GPU architectures:
-- **gfx1151** (STX Halo APU) - Ryzen AI MAX+ Pro 395
-- **gfx1150** (STX Point APU) - Ryzen AI 300
-- **gfx120X** (RDNA4 GPUs) - includes AMD Radeon RX 9070 XT/GRE/9070, RX 9060 XT/9060
-- **gfx110X** (RDNA3 GPUs) - includes AMD Radeon dGPUs: PRO W7900/W7800/W7700/W7600, RX 7900 XTX/XT/GRE, RX 7800 XT, RX 7700 XT/7700, RX 7600 XT/7600 and iGPUs: Radeon 780M/760M/740M
-- **gfx103X** (RDNA2 GPUs) - includes AMD Radeon dGPUs: RX 6800 XT/6800, RX 6700 XT/6700, RX 6600 XT/6600, RX 6500 XT/6500
-- **gfx90a** (CDNA2 GPU) - AMD Instinct MI210
-- **gfx908** (CDNA1 GPU) - AMD Instinct MI100
-
-**All builds include ROCm™ 7 built-in** - no separate ROCm™ installation required!
-
-## 🚀 Automated Builds
-
-Our automated GitHub Actions workflow creates nightly builds for:
-- **Windows** and **Ubuntu** operating systems
-- **Multiple GPU targets**: `gfx1151`, `gfx1150`, `gfx110X`, `gfx120X`, `gfx103X`, `gfx90a`, `gfx908`
-- **ROCm™ 7 built-in** - complete runtime libraries included
-
-
-| GPU Target | Ubuntu | Windows |
-|-------------|--------|---------|
-| **gfx110X** | [![Download Ubuntu gfx110X](https://img.shields.io/badge/Download-Ubuntu%20gfx110X-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx110X](https://img.shields.io/badge/Download-Windows%20gfx110X-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx1150** | [![Download Ubuntu gfx1150](https://img.shields.io/badge/Download-Ubuntu%20gfx1150-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx1150](https://img.shields.io/badge/Download-Windows%20gfx1150-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx1151** | [![Download Ubuntu gfx1151](https://img.shields.io/badge/Download-Ubuntu%20gfx1151-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx1151](https://img.shields.io/badge/Download-Windows%20gfx1151-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx120X** | [![Download Ubuntu gfx120X](https://img.shields.io/badge/Download-Ubuntu%20gfx120X-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx120X](https://img.shields.io/badge/Download-Windows%20gfx120X-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx103X** | [![Download Ubuntu gfx103X](https://img.shields.io/badge/Download-Ubuntu%20gfx103X-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx103X](https://img.shields.io/badge/Download-Windows%20gfx103X-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx90a** | [![Download Ubuntu gfx90a](https://img.shields.io/badge/Download-Ubuntu%20gfx90a-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx90a](https://img.shields.io/badge/Download-Windows%20gfx90a-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-| **gfx908** | [![Download Ubuntu gfx908](https://img.shields.io/badge/Download-Ubuntu%20gfx908-blue)](https://github.com/aigdat/llamacpp-rocm/releases/latest) | [![Download Windows gfx908](https://img.shields.io/badge/Download-Windows%20gfx908-green)](https://github.com/aigdat/llamacpp-rocm/releases/latest) |
-
-> **⚡ Ready to Run**: All releases include complete ROCm™ 7 runtime libraries - just download and go!
-
-> **Linux (gfx1150/APU):** OOM despite free VRAM? Add `ttm.pages_limit=12582912` (48 GB) to the kernel cmdline (e.g. GRUB), run `update-grub`, then reboot. See [TheRock FAQ](https://github.com/ROCm/TheRock/blob/main/docs/faq.md#gfx1151-strix-halo-specific-questions) for more.
+</div>
 
 ---
 
-## 🧪 Quick Smoketest
+## ⚡ Why RDNA2LLamacpp?
 
-To verify your download is working correctly:
+Running local LLMs on consumer AMD GPUs under Windows and Linux has historically been difficult: official ROCm SDKs are massive (20+ GB), setup is error-prone, and standard releases often lack discrete RDNA2 device kernels.
 
-1. **Download** the appropriate build for your GPU target from our [latest releases](https://github.com/aigdat/llamacpp-rocm/releases/latest)
-2. **Extract** the archive to your preferred directory
-3. **Test** with any GGUF model from Hugging Face:
+**RDNA2LLamacpp solves this:**
+- **Zero SDK Installation**: Binaries are 100% self-contained. All necessary ROCm runtime libraries (`amdhip64`, `rocblas`, `hipblaslt`, and pre-compiled `.kpack` GPU kernels) are bundled alongside the executable. Just extract and run.
+- **Dedicated RDNA2 Machine Code**: Compiled specifically for discrete RDNA2 sub-architectures (`gfx1030`, `gfx1031`, `gfx1032`, `gfx1034`), avoiding multi-architecture bloat.
+- **Nightly Freshness**: Our automated GitHub Actions pipeline automatically detects and integrates the latest daily `llama.cpp` upstream master with the freshest AMD TheRock nightly runtime.
 
-```bash
-llama-server -m YOUR_GGUF_MODEL_PATH -ngl 99
+---
+
+## 🎯 Supported GPUs
+
+This repository targets all discrete **AMD Radeon RX 6000 Series (RDNA2 / `gfx103X`)** graphics cards:
+
+| Architecture ID | Graphics Cards | VRAM |
+| :--- | :--- | :--- |
+| **`gfx1030`** | AMD Radeon **RX 6950 XT**, **RX 6900 XT**, **RX 6800 XT**, **RX 6800** | 16 GB GDDR6 |
+| **`gfx1031`** | AMD Radeon **RX 6750 XT**, **RX 6700 XT**, **RX 6700** | 10–12 GB GDDR6 |
+| **`gfx1032`** | AMD Radeon **RX 6650 XT**, **RX 6600 XT**, **RX 6600** | 8 GB GDDR6 |
+| **`gfx1034`** | AMD Radeon **RX 6500 XT**, **RX 6400** | 4 GB GDDR6 |
+
+> [!NOTE]
+> All releases package a unified fat binary covering `gfx1030;gfx1031;gfx1032;gfx1034`, ensuring out-of-the-box compatibility across all cards above.
+
+---
+
+## 🚀 Nightly Downloads
+
+| Operating System | Package | Direct Download |
+| :--- | :--- | :--- |
+| **Windows 10 / 11 (x64)** | `llama-b*-windows-rocm-gfx103X-x64.zip` | [![Download Windows](https://img.shields.io/badge/Download-Windows%20Build-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) |
+| **Ubuntu 22.04+ (x64)** | `llama-b*-ubuntu-rocm-gfx103X-x64.zip` | [![Download Ubuntu](https://img.shields.io/badge/Download-Ubuntu%20Build-E95420?style=flat-square&logo=ubuntu&logoColor=white)](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) |
+
+---
+
+## 🧪 Quick Start
+
+### 1. Download & Extract
+Download the archive for your operating system from [Latest Releases](https://github.com/arefabacworkshop/RDNA2LLamacpp/releases/latest) and extract it to your preferred folder.
+
+### 2. Run Inference
+You can immediately launch `llama-server` (OpenAI-compatible local server) or `llama-cli` with any GGUF model:
+
+#### Windows (PowerShell / Command Prompt):
+```cmd
+llama-server.exe -m "C:\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" -ngl 99 -fa -b 512 -ub 256
 ```
 
-> **💡 Tip**: Use `-ngl 99` to offload all layers to GPU for maximum acceleration. The exact number of layers may vary by model, but 99 ensures all available layers are offloaded.
-
-> **🍋 Lemonade Integration**: You can also test these builds directly with [**Lemonade**](https://github.com/lemonade-sdk/lemonade) for a seamless AI application experience *(coming soon!)*
-
----
-
-## 📦 Dependencies
-
-This project relies on the following external software and tools:
-
-### Core Dependencies
-- **[Llama.cpp](https://github.com/ggerganov/llama.cpp)** - Efficient, cross-platform inference engine for running GGUF models locally.
-- **[ROCm SDK (TheRock)](https://github.com/ROCm/TheRock)** - AMD’s open-source platform for GPU-accelerated computing.
-- **[HIP](https://github.com/ROCm/HIP)** - C++ API for writing portable GPU code within the ROCm ecosystem.
-
-### Build Tools & Compilers
-- **[Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)** - Microsoft C++ build tools
-- **[CMake](https://cmake.org/)** - Cross-platform build system (version 3.31.0)
-- **[Ninja](https://ninja-build.org/)** - Small build system with focus on speed
-- **[Clang/Clang++](https://clang.llvm.org/)** - C/C++ compiler (bundled with ROCm)
+#### Ubuntu:
+```bash
+./llama-server -m ~/models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf -ngl 99 -fa -b 512 -ub 256
+```
 
 ---
 
-## 🏗️ Code and Artifact Structure
+## 💡 RDNA2 Performance Tuning
 
-> [!NOTE]  
-> **Active Development**: This project is under active development. Code and artifact structure are subject to change as we continue to improve and expand functionality.
+To maximize token generation speed on RDNA2 hardware, use these recommended parameters:
 
-### Key Components
-
-- **`docs/`** - Contains build documentation and setup guides
-- **`utils/`** - Houses utility scripts for build automation and dependency management
-- **GitHub Actions Workflows** - Located in `.github/workflows/` (automated build pipeline)
-- **Build Artifacts** - Generated during CI/CD and published as releases
-
-The build process is primarily handled through GitHub Actions, with the repository serving as the source for automated compilation and packaging of llama.cpp with ROCm™ 7 support.
+- **`-ngl 99` (GPU Layer Offload)**: Offloads all model layers to your Radeon GPU VRAM.
+- **`-fa` (Flash Attention)**: Essential on RDNA2. Bypasses intermediate $O(N^2)$ attention matrices, saving gigabytes of VRAM and drastically speeding up long context prompts.
+- **`-b 512 -ub 256` (Batch Tuning)**: Matches physical micro-batches to RDNA2 SIMD32 compute units to maintain high occupancy.
+- **Quantization Choice (`Q4_K_M` / `Q5_K_M`)**: RDNA2 features on-chip high-speed **Infinity Cache** (96 MB on RX 6700 series, 128 MB on RX 6800/6900 series). Medium 4-bit and 5-bit models fit more working memory directly inside the cache for maximum memory bandwidth.
+- **Windows HAGS**: In Windows *Settings > System > Display > Graphics > Default graphics settings*, enable **Hardware-accelerated GPU scheduling** for lower kernel dispatch latency.
 
 ---
 
-## 📋 Manual Build Instructions
+## 🛠️ Repository Structure
 
-For detailed manual build instructions, please see: **[docs/manual_instructions.md](docs/manual_instructions.md)**
+```
+RDNA2LLamacpp/
+├── .github/
+│   ├── actions/
+│   │   └── test-llamacpp-build/     # Automated smoke-test action using Qwen3 GGUF
+│   ├── ISSUE_TEMPLATE/              # Tailored RDNA2 bug reports & issue configs
+│   └── workflows/
+│       ├── build-llamacpp-rocm.yml  # Main CI/CD matrix build & release pipeline
+│       └── test-llamacpp-rocm.yml   # Dispatchable test workflow for hardware runners
+├── docs/
+│   └── manual_instructions.md       # Complete local manual compilation guide
+├── utils/
+│   └── gather_required_libs.py      # Dynamic Linux shared library dependency resolver
+├── LICENSE                          # MIT License
+└── README.md                        # Documentation & quick start
+```
+
+---
+
+## 📋 Manual Compilation
+
+If you prefer building from source on your own machine rather than downloading pre-compiled releases, refer to our detailed step-by-step guide:  
+👉 **[docs/manual_instructions.md](docs/manual_instructions.md)**
+
+---
+
+## 🤝 Upstream Projects & Credits
+
+This project builds upon the hard work of:
+- **[llama.cpp](https://github.com/ggerganov/llama.cpp)** by Georgi Gerganov and contributors.
+- **[TheRock](https://github.com/ROCm/TheRock)** (AMD ROCm™ multi-architecture compute platform).
+- Upstream pipeline foundations from [aigdat/llamacpp-rocm](https://github.com/aigdat/llamacpp-rocm) & [lemonade-sdk](https://github.com/lemonade-sdk/lemonade).
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This repository is distributed under the [MIT License](LICENSE).
