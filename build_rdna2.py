@@ -317,9 +317,22 @@ def main():
         print("[+] Bundled rocblas GPU kernels.")
 
     # Step 6: Deploy to Target Folder
-    if args.dest and os.path.isdir(args.dest):
-        print_step(f"Step 6: Deploying Binaries to {args.dest}")
-        dest_path = Path(args.dest)
+    deploy_dir = None
+    if args.dest:
+        dest_str = args.dest
+        if "{build}" in dest_str or "{gpu}" in dest_str:
+            try:
+                build_num = subprocess.check_output(["git", "rev-list", "--count", "HEAD"], cwd=llama_dir, text=True).strip()
+                b_tag = f"b{build_num}"
+            except Exception:
+                b_tag = "latest"
+            dest_str = dest_str.replace("{build}", b_tag).replace("{gpu}", args.gpu_target)
+
+        dest_path = Path(dest_str)
+        dest_path.mkdir(parents=True, exist_ok=True)
+        deploy_dir = str(dest_path)
+
+        print_step(f"Step 6: Deploying Binaries to {deploy_dir}")
         for f in glob.glob(os.path.join(bin_dir, "*.exe")) + glob.glob(os.path.join(bin_dir, "*.dll")):
             shutil.copy2(f, dest_path / os.path.basename(f))
             print(f"[+] Deployed: {os.path.basename(f)}")
@@ -327,14 +340,27 @@ def main():
         if os.path.isdir(dst_rocblas):
             shutil.copytree(dst_rocblas, dest_path / "rocblas", dirs_exist_ok=True)
             print("[+] Deployed rocblas library.")
-        print(f"[+] Deployment complete in {args.dest}")
+
+        bat_launcher = dest_path / "Update llama.cpp.bat"
+        if not bat_launcher.exists():
+            script_path = str(Path(__file__).resolve())
+            bat_content = (
+                "@echo off\nsetlocal\n"
+                f'cd /d "{os.path.dirname(script_path)}"\n'
+                f'python "{script_path}" --dest "%~dp0." %*\n'
+                "pause\n"
+            )
+            bat_launcher.write_text(bat_content, encoding="utf-8")
+            print("[+] Created Update llama.cpp.bat launcher in deployment folder.")
+
+        print(f"[+] Deployment complete in {deploy_dir}")
     else:
         print_step("Step 6: Standalone Binaries Ready")
         print(f"[+] All self-contained binaries and DLLs are located at: {bin_dir}")
 
     # Step 7: Verification
     print_step("Step 7: Verifying Binary and GPU Detection")
-    verify_dir = args.dest if (args.dest and os.path.isdir(args.dest)) else bin_dir
+    verify_dir = deploy_dir if deploy_dir else bin_dir
     cli_exe = os.path.join(verify_dir, "llama-cli.exe")
     if os.path.isfile(cli_exe):
         clean_env = {"PATH": f"C:\\Windows\\system32;C:\\Windows;{verify_dir}"}
