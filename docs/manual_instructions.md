@@ -97,6 +97,7 @@ cmake .. -G Ninja ^
   -DLLAMA_BUILD_BORINGSSL=ON ^
   -DGGML_NATIVE=OFF ^
   -DGGML_STATIC=OFF ^
+  -DGGML_CUDA_FA_QUANTS="q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0" ^
   -DCMAKE_SYSTEM_NAME=Windows
 
 cmake --build . -j %NUMBER_OF_PROCESSORS%
@@ -158,6 +159,7 @@ cmake .. -G Ninja \
   -DLLAMA_BUILD_BORINGSSL=ON \
   -DGGML_NATIVE=OFF \
   -DGGML_STATIC=OFF \
+  -DGGML_CUDA_FA_QUANTS="q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0" \
   -DCMAKE_SYSTEM_NAME=Linux
 
 cmake --build . -j $(nproc)

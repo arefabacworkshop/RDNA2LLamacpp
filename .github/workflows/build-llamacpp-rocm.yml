@@ -23,6 +23,10 @@ on:
         required: false
         default: true
         type: boolean
+      fa_quants:
+        description: 'FlashAttention K-V type combinations (e.g., "q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0" or "all")'
+        required: false
+        default: 'q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0'
 
   # Trigger on pushes to pull requests
   pull_request:
@@ -39,6 +43,7 @@ env:
   GFX_TARGETS: ${{ github.event.inputs.gfx_target || 'gfx103X' }}
   ROCM_VERSION: ${{ github.event.inputs.rocm_version || 'latest' }}
   LLAMACPP_VERSION: ${{ github.event.inputs.llamacpp_version || 'latest' }}
+  FA_QUANTS: ${{ github.event.inputs.fa_quants || 'q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0' }}
 
 jobs:
   prepare-matrix:
@@ -313,6 +318,7 @@ jobs:
           -DLLAMA_BUILD_BORINGSSL=ON ^
           -DGGML_NATIVE=OFF ^
           -DGGML_STATIC=OFF ^
+          -DGGML_CUDA_FA_QUANTS="${{ env.FA_QUANTS }}" ^
           -DCMAKE_SYSTEM_NAME=Windows
 
         REM Build the project
@@ -700,6 +706,7 @@ jobs:
           -DLLAMA_BUILD_BORINGSSL=ON \
           -DGGML_NATIVE=OFF \
           -DGGML_STATIC=OFF \
+          -DGGML_CUDA_FA_QUANTS="${{ env.FA_QUANTS }}" \
           -DCMAKE_SYSTEM_NAME=Linux
 
         # Build the project
@@ -1048,6 +1055,7 @@ jobs:
         **GPU Target(s)**: $targets
         **ROCm Version**: $ROCM_VERSION
         **Llama.cpp Commit Hash**: $LLAMACPP_COMMIT_HASH
+        **FlashAttention Quants**: ${{ env.FA_QUANTS }}
         **Build Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
         This release includes compiled llama.cpp binaries with ROCm support for AMD RDNA2 GPU targets (gfx103X: gfx1030, gfx1031, gfx1032, gfx1034), with all essential ROCm runtime libraries included." \
