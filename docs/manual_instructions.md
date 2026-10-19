@@ -69,6 +69,31 @@ git clone --filter=blob:none --single-branch --branch master https://github.com/
 
 ### 3. Build
 
+#### Method A: 1-Click Automated Builder (Recommended)
+
+This repository includes a fully automated 1-click builder and updater:
+
+1. Open `build_config.ini` and set your paths and target GPU (or leave empty to auto-detect):
+   ```ini
+   [GPU]
+   gpu_target = gfx1030     # or gfx1031, gfx1032, gfx1034
+
+   [Paths]
+   rocm_path = C:\opt\rocm  # Path to your ROCm / TheRock extraction
+   llama_dir =              # Leave empty to auto-detect or auto-clone
+   deploy_path =            # Optional: where to copy final binaries
+   ```
+2. Double-click **`Build_or_Update.bat`** (or run `python build_rdna2.py`).
+3. The script will automatically:
+   - Detect MSVC 2022 and Windows SDK
+   - Fetch the latest `llama.cpp` commits via `git pull`
+   - Configure CMake with full FlashAttention quantization kernels
+   - Compile using Ninja
+   - Bundle all required ROCm runtime DLLs (`amdhip64_7.dll`, `rocblas.dll`, etc.) and `rocblas\library` GPU kernels
+   - Verify GPU detection on your card
+
+#### Method B: Manual Step-by-Step Command Line
+
 Open **x64 Native Tools Command Prompt for VS 2022** and run:
 
 ```cmd
@@ -81,11 +106,13 @@ mkdir build
 cd build
 
 cmake .. -G Ninja ^
+  -DCMAKE_BUILD_TYPE=Release ^
+  -DCMAKE_SYSTEM_PROCESSOR=AMD64 ^
+  -DCMAKE_CROSSCOMPILING=ON ^
+  -DCMAKE_SYSTEM_NAME=Windows ^
   -DCMAKE_C_COMPILER="C:\opt\rocm\lib\llvm\bin\clang.exe" ^
   -DCMAKE_CXX_COMPILER="C:\opt\rocm\lib\llvm\bin\clang++.exe" ^
-  -DCMAKE_CXX_FLAGS="-IC:\opt\rocm\include -mwavefrontsize64=0" ^
-  -DCMAKE_CROSSCOMPILING=ON ^
-  -DCMAKE_BUILD_TYPE=Release ^
+  -DCMAKE_CXX_FLAGS="-IC:\opt\rocm\include" ^
   -DGPU_TARGETS="gfx1030;gfx1031;gfx1032;gfx1034" ^
   -DBUILD_SHARED_LIBS=ON ^
   -DLLAMA_BUILD_TESTS=OFF ^
@@ -97,8 +124,7 @@ cmake .. -G Ninja ^
   -DLLAMA_BUILD_BORINGSSL=ON ^
   -DGGML_NATIVE=OFF ^
   -DGGML_STATIC=OFF ^
-  -DGGML_CUDA_FA_QUANTS="q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0" ^
-  -DCMAKE_SYSTEM_NAME=Windows
+  -DGGML_CUDA_FA_QUANTS="q4_0-q4_0;q4_1-q4_1;q5_0-q5_0;q5_1-q5_1;q8_0-q8_0;f16-f16;bf16-bf16;q8_0-q4_0;q8_0-q4_1;q8_0-q5_0;q8_0-q5_1;q5_0-q4_0;q5_0-q5_1;q5_1-q4_0;q4_1-q4_0"
 
 cmake --build . -j %NUMBER_OF_PROCESSORS%
 ```
